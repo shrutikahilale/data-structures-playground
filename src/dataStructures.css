@@ -1,0 +1,96 @@
+/* App.css */
+.app {
+  padding: 20px;
+  max-width: 1200px;
+  margin: auto;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.header h1 {
+  font-size: 2.5em;
+}
+
+.main-content {
+  margin-bottom: 40px;
+}
+
+.data-structures {
+  text-align: center;
+}
+
+.data-structure-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.data-structure-card {
+  border: 1px solid #909090;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #373737;
+  cursor: pointer;
+  width: 400px;
+  transition: background-color 0.3s ease;
+}
+
+.data-structure-card img {
+  height: 70px;
+}
+
+.data-structure-card:hover {
+  background-color: #171717;
+}
+
+.data-structure-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  background-color: #171717;
+  border: 1px solid #909090;
+  border-radius: 2em;
+  padding: 2rem;
+}
+
+.data-structure-details h2 {
+  text-align: center;
+}
+
+.data-structure-details ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.footer {
+  text-align: center;
+}
+
+.footer a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}
+
+button {
+  font-weight: 700;
+  border: 0;
+  border-radius: 3em;
+  cursor: pointer;
+  display: inline-block;
+  line-height: 1;
+  font-size: 1rem;
+  padding: 10px 16px;
+  color: white;
+  background-color: #1ea7fd;
+  margin: 0.5rem;
+}
