@@ -1,6 +1,5 @@
 import "../dataStructures.css"; // Make sure to create this CSS file for styling
-import Playground from "./playground";
-import React, { useState } from "react";
+import React from "react";
 
 const instrData = {
   array: [
@@ -30,8 +29,7 @@ const instrData = {
   ],
 };
 
-function InstructionsComponent({ ds, setShowHomepage, setSelectedDs }) {
-  const [showPlayground, setShowPlayground] = useState(false);
+function InstructionsComponent({ ds, goToPlayground, goBackToList }) {
   const dsVal = ds.charAt(0).toUpperCase() + ds.slice(1);
 
   return instrData.hasOwnProperty(ds) ? (
@@ -45,18 +43,9 @@ function InstructionsComponent({ ds, setShowHomepage, setSelectedDs }) {
         ))}
       </ul>
 
-      <button onClick={() => setShowPlayground(true)}>Go to playground</button>
+      <button onClick={goToPlayground}>Go to playground</button>
 
-      <button
-        onClick={() => {
-          setShowHomepage(true);
-          setSelectedDs("");
-        }}
-      >
-        Back to List
-      </button>
-
-      {showPlayground ? <Playground /> : null}
+      <div onClick={goBackToList}>Back to List</div>
     </div>
   ) : null;
 }
