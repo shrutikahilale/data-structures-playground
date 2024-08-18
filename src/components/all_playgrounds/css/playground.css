@@ -1,0 +1,12 @@
+.playground-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.operations-section {
+  margin: 0.5rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}

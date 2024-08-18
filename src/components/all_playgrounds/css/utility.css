@@ -1,0 +1,47 @@
+.custom-input {
+  width: 100%;
+  max-width: 300px;
+  padding: 0.5rem;
+  margin: 1rem 0;
+  font-size: 1rem;
+  background-color: #2c2c2c;
+  color: #ffffff;
+  border: 2px solid #444;
+  border-radius: 5px;
+  outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.custom-input:focus {
+  border-color: #1e90ff;
+  box-shadow: 0 0 5px rgba(30, 144, 255, 0.8);
+}
+
+.custom-input::placeholder {
+  color: #888;
+}
+
+.positive-op:hover {
+  background-color: #66bb6a; /* Lighter green on hover */
+}
+
+.positive-op:active {
+  background-color: #388e3c; /* Darker green on click */
+}
+
+.negative-op:hover {
+  background-color: #bb667b; /* Lighter green on hover */
+}
+
+.negative-op:active {
+  background-color: #c34141; /* Darker green on click */
+}
+
+.reset-op:hover {
+  background-color: #9ca0f5; /* Darker green on click */
+}
+
+.reset-op:active {
+  background-color: #33367d; /* Darker green on click */
+}

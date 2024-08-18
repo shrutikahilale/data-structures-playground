@@ -1,0 +1,15 @@
+.outer-block {
+  display: flex;
+  gap: 10px;
+  margin: 2rem;
+  padding: 0.785rem;
+  background-color: #ffffffb4;
+  width: fit-content;
+}
+
+.inner-block {
+  background-color: rgb(31, 31, 31);
+  padding: 0.785rem;
+  border-radius: 10px;
+  font-size: 1.275rem;
+}
