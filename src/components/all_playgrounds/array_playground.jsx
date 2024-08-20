@@ -3,12 +3,13 @@ import "./css/block.css";
 import "./css/utility.css";
 import "./css/playground.css";
 
-export default function ArrayPlayground() {
-  const initialArraySize = 4;
+const initialArraySize = 4;
 
-  const [array, setArray] = useState([]);
+export default function ArrayPlayground() {
+  const [array, setArray] = useState(new Array(initialArraySize).fill(null));
   const [arraySize, setArraySize] = useState(initialArraySize);
   const [value, setValue] = useState("");
+  const [eIndex, setEIndex] = useState("");
   const [typeError, setTypeError] = useState("");
   const [sizeError, setSizeError] = useState("");
 
@@ -16,28 +17,48 @@ export default function ArrayPlayground() {
   const add = () => {
     const numValue = parseFloat(value.trim());
 
-    if (array.length >= arraySize) {
+    if (array.filter((e) => e !== null).length >= arraySize) {
       setSizeError(`Array size limit of ${arraySize} exceeded.`);
       setTypeError("");
     } else if (isNaN(numValue)) {
       setTypeError("Please enter a valid number.");
       setSizeError("");
     } else {
-      setArray([...array, numValue]);
-      setValue("");
-      setTypeError("");
-      setSizeError("");
+      const newArray = [...array];
+      const firstNullIndex = newArray.indexOf(null);
+      if (firstNullIndex !== -1) {
+        newArray[firstNullIndex] = numValue;
+        setArray(newArray);
+        setValue("");
+        setTypeError("");
+        setSizeError("");
+      }
     }
   };
 
-  // remove last element from the array
+  // remove element from the array
   const remove = () => {
-    if (array.length > 0) {
-      setArray(array.slice(0, -1));
+    if (eIndex == "") {
+      setSizeError("No index passed");
+    } else {
+      const indexToRemove = parseInt(eIndex, 10); // Convert eIndex to a number
+      if (array.length > 0 && indexToRemove > -1 && indexToRemove < arraySize) {
+        const newArray = [...array];
+        newArray.splice(indexToRemove, 1); // Remove the element at the specified index
+        newArray.push(null); // Add a null at the end to keep the array size consistent
+        setArray(newArray); // Update the state with the modified array
+        setEIndex(""); // Clear the index input field
+      } else if (array.length <= 0) {
+        setSizeError("No elements found which can be removed");
+      } else if (indexToRemove < 0) {
+        setSizeError("Index is invalid bro!!");
+      } else if (indexToRemove >= array.length) {
+        setSizeError("Index exceeded array sizeee");
+      }
     }
   };
 
-  // get the num value
+  // get the numeric value
   const numValue = (value) => {
     const sanitizedValue = value.replace(/[^\d]/g, ""); // Remove non-digit characters
     const parsedValue = parseInt(sanitizedValue, 10);
@@ -48,25 +69,32 @@ export default function ArrayPlayground() {
   const updateArraySize = (inputValue) => {
     const val = numValue(inputValue);
 
-    // Allow the value to change first, then validate it.
     if (val === 0 || val === "") {
       setSizeError("Array size must be greater than zero.");
-    } else if (val < array.length) {
+    } else if (val < array.filter((e) => e !== null).length) {
       setSizeError(
         "Array size cannot be smaller than the current number of elements."
       );
     } else {
       setSizeError("");
+      const newArray = [...array];
+      if (val > arraySize) {
+        newArray.length = val; // Increase the array size
+        newArray.fill(null, arraySize); // Fill the new slots with null
+      } else if (val < arraySize) {
+        newArray.length = val; // Reduce the array size
+      }
+      setArray(newArray);
+      setArraySize(val);
     }
-
-    setArraySize(val);
   };
 
   // reset everything
   const resetAll = () => {
-    setArray([]);
+    setArray(new Array(initialArraySize).fill(null));
     setArraySize(initialArraySize);
     setValue("");
+    setEIndex("");
     setTypeError("");
     setSizeError("");
   };
@@ -81,12 +109,19 @@ export default function ArrayPlayground() {
         placeholder="Enter a number"
         className="custom-input"
       />
+      <input
+        type="text"
+        value={eIndex}
+        onChange={(e) => setEIndex(e.target.value)}
+        placeholder="Enter index to be removed"
+        className="custom-input"
+      />
       <div className="operations-section">
         <button onClick={add} className="positive-op">
           Add
         </button>
         <button onClick={remove} className="negative-op">
-          Remove
+          Remove at index
         </button>
         <button onClick={resetAll} className="reset-op">
           Reset
@@ -96,20 +131,18 @@ export default function ArrayPlayground() {
         type="text"
         value={arraySize}
         onChange={(e) => updateArraySize(e.target.value)}
-        placeholder="Enter array size (default to 4)"
+        placeholder={`Enter array size (default to ${arraySize})`}
         className="custom-input"
       />
       {typeError && <p className="error-message">{typeError}</p>}
       {sizeError && <p className="error-message">{sizeError}</p>}
-      {array.length > 0 && (
-        <div className="outer-block">
-          {array.map((e, i) => (
-            <div key={i} className="inner-block">
-              {e}
-            </div>
-          ))}
-        </div>
-      )}
+      <div className="outer-block">
+        {array.map((e, i) => (
+          <div key={i} className={`inner-block ${e === null ? "empty" : ""}`}>
+            {e !== null ? e : ""}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

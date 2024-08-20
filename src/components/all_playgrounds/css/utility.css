@@ -45,3 +45,8 @@
 .reset-op:active {
   background-color: #33367d; /* Darker green on click */
 }
+
+.error-message {
+  color: #ff9696;
+  font-weight: bold;
+}
