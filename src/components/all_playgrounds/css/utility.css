@@ -1,6 +1,6 @@
 .custom-input {
   width: 100%;
-  max-width: 300px;
+  max-width: 500px;
   padding: 0.5rem;
   margin: 1rem 0;
   font-size: 1rem;
@@ -36,6 +36,14 @@
 
 .negative-op:active {
   background-color: #c34141; /* Darker green on click */
+}
+
+.gen-op:hover {
+  background-color: #5fdaff; /* Darker green on click */
+}
+
+.gen-op:active {
+  background-color: #117999; /* Darker green on click */
 }
 
 .reset-op:hover {
