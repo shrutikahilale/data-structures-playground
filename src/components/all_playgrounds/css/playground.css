@@ -10,3 +10,7 @@
   justify-content: center;
   gap: 1rem;
 }
+
+.stack-visual {
+  display: flex;
+}

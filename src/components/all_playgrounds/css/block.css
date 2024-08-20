@@ -11,5 +11,27 @@
   background-color: rgb(31, 31, 31);
   padding: 0.785rem;
   border-radius: 10px;
+  min-width: 3rem;
+  height: 3rem;
   font-size: 1.275rem;
+}
+
+.inner-block.empty {
+  background-color: #211e1e87;
+  color: transparent; /* Hide the text for empty blocks */
+}
+
+.op-blocks {
+  background-color: rgb(31, 31, 31);
+  padding: 0.785rem;
+  border-radius: 10px;
+  min-width: 5rem;
+  height: 3rem;
+  font-size: 1.275rem;
+}
+
+.op-blocks-section {
+  gap: 1rem;
+  padding: 1rem;
+  flex-direction: column;
 }

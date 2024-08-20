@@ -1,6 +1,6 @@
 .custom-input {
   width: 100%;
-  max-width: 300px;
+  max-width: 500px;
   padding: 0.5rem;
   margin: 1rem 0;
   font-size: 1rem;
@@ -38,10 +38,23 @@
   background-color: #c34141; /* Darker green on click */
 }
 
+.gen-op:hover {
+  background-color: #5fdaff; /* Darker green on click */
+}
+
+.gen-op:active {
+  background-color: #117999; /* Darker green on click */
+}
+
 .reset-op:hover {
   background-color: #9ca0f5; /* Darker green on click */
 }
 
 .reset-op:active {
   background-color: #33367d; /* Darker green on click */
+}
+
+.error-message {
+  color: #ff9696;
+  font-weight: bold;
 }
