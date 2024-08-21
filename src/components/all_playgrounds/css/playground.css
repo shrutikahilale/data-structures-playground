@@ -12,5 +12,5 @@
 }
 
 .stack-visual {
-  display: flex;
+  border-left: 1rem solid rgb(38, 110, 255);
 }
