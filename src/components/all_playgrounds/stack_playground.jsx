@@ -88,6 +88,8 @@ export default function StackPlayground() {
     setSizeError("");
   };
 
+  const [inputArraySize, setInputArraySize] = useState(stackSize);
+
   return (
     <div className="playground-section">
       <h1>Stack Playground</h1>
@@ -109,28 +111,32 @@ export default function StackPlayground() {
           Reset
         </button>
       </div>
-      <input
-        type="text"
-        value={stackSize}
-        onChange={(e) => updateArraySize(e.target.value)}
-        placeholder={`Enter array size (default to ${stackSize})`}
-        className="custom-input"
-      />
+
+      <div className="display-flex  gap-10 w-100per jc-center">
+        <input
+          type="text"
+          value={inputArraySize}
+          onChange={(e) => setInputArraySize(e.target.value)}
+          placeholder={`Enter array size (default to ${stackSize})`}
+          className="custom-input"
+        />
+        <button
+          onClick={() => updateArraySize(inputArraySize)}
+          className="gen-op"
+        >
+          Update Size
+        </button>
+      </div>
+
       {typeError && <p className="error-message">{typeError}</p>}
       {sizeError && <p className="error-message">{sizeError}</p>}
 
-      <div className="stack-visual">
-        <div className="outer-block">
-          {stack.map((e, i) => (
-            <div key={i} className={`inner-block ${e === null ? "empty" : ""}`}>
-              {e !== null ? e : ""}
-            </div>
-          ))}
-        </div>
-        <div className="op-blocks-section">
-          <div className="op-blocks">Pop</div>
-          <div className="op-blocks">Push</div>
-        </div>
+      <div className="outer-block stack-visual">
+        {stack.map((e, i) => (
+          <div key={i} className={`inner-block ${e === null ? "empty" : ""}`}>
+            {e !== null ? e : ""}
+          </div>
+        ))}
       </div>
     </div>
   );
