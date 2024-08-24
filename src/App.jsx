@@ -5,8 +5,7 @@ import LinkedListPlayground from "./components/all_playgrounds/ll_playground";
 const App = () => {
   return (
     <div className="app">
-      {/* <Home /> */}
-      <LinkedListPlayground />
+      <Home />
     </div>
   );
 };
