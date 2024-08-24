@@ -28,6 +28,15 @@
   }
 }
 
+@keyframes createNode {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
 .linked-list-outer-block {
   display: flex;
   flex-direction: row;
@@ -57,4 +66,12 @@
 
 .linked-list-outer-block.animate-delete {
   animation: deleteNode 2s ease-in-out forwards;
+}
+
+/* a total delay of 4s then it should disappear*/
+.linked-list-block.animate-create {
+  animation: createNode 2s ease-in-out forwards;
+}
+.linked-list-arrow.animate-create {
+  animation: createNode 4s ease-in-out forwards;
 }

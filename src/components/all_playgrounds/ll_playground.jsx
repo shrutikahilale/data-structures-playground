@@ -5,6 +5,12 @@ import "./css/ll.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 
+const timings = {
+  create: 4000,
+  insert: 2000,
+  delete: 1000,
+};
+
 export default function LinkedListPlayground() {
   const [linkedList, setLinkedList] = useState([1, 2]);
   const [val1, setVal1] = useState("");
@@ -36,15 +42,21 @@ export default function LinkedListPlayground() {
     if (validationError) return setError(validationError);
 
     const idx = numValue(index);
-    setOperation({ type: "insert", index: idx });
-    setLinkedList((prevList) => {
-      const ll = [...prevList];
-      ll.splice(idx, 0, numValue(val1));
-      return ll;
-    });
-    setVal1("");
-    setIndex("");
-    setError("");
+    // first show create node animation
+    setOperation({ type: "create" });
+
+    // after create animation delay, show insert node animation
+    setTimeout(() => {
+      setOperation({ type: "insert", index: idx });
+      setLinkedList((prevList) => {
+        const ll = [...prevList];
+        ll.splice(idx, 0, numValue(val1));
+        return ll;
+      });
+      setVal1("");
+      setIndex("");
+      setError("");
+    }, timings.create); // Delay the insertion to match the create animation duration
   };
 
   const deleteNodeAtIdx = () => {
@@ -66,14 +78,16 @@ export default function LinkedListPlayground() {
         return ll;
       });
       setOperation(null); // Reset operation state after deletion
+      setVal1("");
       setIndex("");
-    }, 1000); // Match the duration of the delete animation
+    }, deleteAnimationDuration); // Match the duration of the delete animation
   };
 
   // Use useEffect to handle operation timing
   useEffect(() => {
     if (operation) {
-      const duration = operation.type === "insert" ? 2000 : 1000;
+      const duration = timings[operation.type];
+      console.log("duration ", duration);
       const timer = setTimeout(() => setOperation(null), duration);
       return () => clearTimeout(timer);
     }
@@ -82,6 +96,16 @@ export default function LinkedListPlayground() {
   return (
     <div>
       <h1>Linked List Playground</h1>
+
+      {operation?.type === "create" && (
+        <div className="linked-list-outer-block">
+          <div className="linked-list-block animate-create">{val1}</div>
+          <FontAwesomeIcon
+            className="linked-list-arrow animate-create"
+            icon={faArrowRight}
+          />
+        </div>
+      )}
 
       {linkedList.length > 0 && (
         <div className="linked-list-visual">
