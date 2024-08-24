@@ -35,3 +35,23 @@
   padding: 1rem;
   flex-direction: column;
 }
+
+.linked-list-block {
+  width: 5rem;
+  height: 3rem;
+  background-color: rgb(59, 89, 208);
+  border: 1px solid white;
+  font-weight: bold;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0.75rem;
+}
+
+.linked-list-outer-block {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}

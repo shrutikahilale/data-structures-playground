@@ -14,3 +14,10 @@
 .stack-visual {
   border-left: 1rem solid rgb(38, 110, 255);
 }
+
+.linked-list-visual {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 2rem;
+}
