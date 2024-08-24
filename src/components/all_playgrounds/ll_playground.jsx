@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./css/playground.css";
 import "./css/block.css";
 import "./css/ll.css";
@@ -8,66 +8,76 @@ import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 export default function LinkedListPlayground() {
   const [linkedList, setLinkedList] = useState([1, 2]);
   const [val1, setVal1] = useState("");
-  const [idxToAddAt, setIdxToAddAt] = useState("");
-  const [val2, setVal2] = useState("");
-  const [idxToRemoveFrom, setIdxToRemoveFrom] = useState("");
+  const [index, setIndex] = useState("");
+  const [operation, setOperation] = useState(null); // Track the operation and index
   const [error, setError] = useState("");
 
-  const numValue = (val1) => {
-    const sanitizedValue = val1.replace(/[^\d]/g, "");
-    const parsedValue = parseInt(sanitizedValue, 10);
-    return isNaN(parsedValue) ? "" : parsedValue;
+  const numValue = (val) => {
+    const sanitizedValue = val.replace(/[^\d]/g, "");
+    return isNaN(parseInt(sanitizedValue, 10))
+      ? ""
+      : parseInt(sanitizedValue, 10);
+  };
+
+  const validateInput = (val, idx) => {
+    if (val.trim() === "") return "Please enter value";
+    if (idx.trim() === "") return "Please enter index";
+    const value = numValue(val);
+    const index = numValue(idx);
+    if (value === "") return "Value is NAN";
+    if (index === "") return "Index is NAN";
+    if (index > linkedList.length)
+      return `Cannot insert at invalid index (${index})`;
+    return "";
   };
 
   const insertNodeAtIdx = () => {
-    if (val1.trim() === "") {
-      setError("Please enter value");
-    } else if (idxToAddAt.trim() === "") {
-      setError("Please enter index");
-    } else {
-      const val = numValue(val1.trim());
-      const index = numValue(idxToAddAt.trim());
+    const validationError = validateInput(val1, index);
+    if (validationError) return setError(validationError);
 
-      if (val === "") {
-        setError("Value is NAN");
-      } else if (index === "") {
-        setError("Index is NAN");
-      } else if (index > linkedList.length) {
-        setError(
-          `Cannot insert at invalid index (${index}) is greater than number of elements (${linkedList.length})`
-        );
-      } else {
-        setError("");
-        const ll = [...linkedList];
-        ll.splice(index, 0, val);
-        setLinkedList(ll);
-
-        setVal1("");
-        setIdxToAddAt("");
-      }
-    }
+    const idx = numValue(index);
+    setOperation({ type: "insert", index: idx });
+    setLinkedList((prevList) => {
+      const ll = [...prevList];
+      ll.splice(idx, 0, numValue(val1));
+      return ll;
+    });
+    setVal1("");
+    setIndex("");
+    setError("");
   };
 
   const deleteNodeAtIdx = () => {
-    if (idxToRemoveFrom.trim() === "") {
-      setError("Please enter index");
-    } else {
-      const index = numValue(idxToRemoveFrom.trim());
-      if (index === "") {
-        setError("Index is NAN");
-      } else if (index > linkedList.length) {
-        setError(
-          `Cannot delete from invalid index, (${index}) is greater than number of elements (${linkedList.length})`
-        );
-      } else {
-        setError("");
-        const ll = [...linkedList];
-        ll.splice(index, 1);
-        setLinkedList(ll);
-        setIdxToRemoveFrom("");
-      }
-    }
+    if (index.trim() === "") return setError("Please enter index");
+
+    const idx = numValue(index);
+    if (idx === "") return setError("Index is NAN");
+    if (idx > linkedList.length - 1)
+      return setError(`Cannot delete from invalid index (${idx})`);
+
+    setOperation({ type: "delete", index: idx });
+    setError("");
+
+    // Delay the actual deletion to allow the animation to play
+    setTimeout(() => {
+      setLinkedList((prevList) => {
+        const ll = [...prevList];
+        ll.splice(idx, 1);
+        return ll;
+      });
+      setOperation(null); // Reset operation state after deletion
+      setIndex("");
+    }, 1000); // Match the duration of the delete animation
   };
+
+  // Use useEffect to handle operation timing
+  useEffect(() => {
+    if (operation) {
+      const duration = operation.type === "insert" ? 2000 : 1000;
+      const timer = setTimeout(() => setOperation(null), duration);
+      return () => clearTimeout(timer);
+    }
+  }, [operation]);
 
   return (
     <div>
@@ -75,8 +85,17 @@ export default function LinkedListPlayground() {
 
       {linkedList.length > 0 && (
         <div className="linked-list-visual">
-          {linkedList.map((e, index) => (
-            <div key={index} className="linked-list-outer-block">
+          {linkedList.map((e, idx) => (
+            <div
+              key={idx}
+              className={`linked-list-outer-block ${
+                operation?.type === "insert" && operation.index === idx
+                  ? "animate-insert"
+                  : operation?.type === "delete" && operation.index === idx
+                    ? "animate-delete"
+                    : ""
+              }`}
+            >
               <div className="linked-list-block">{e}</div>
               <FontAwesomeIcon icon={faArrowRight} />
             </div>
@@ -87,7 +106,7 @@ export default function LinkedListPlayground() {
 
       {error && <div>{error}</div>}
 
-      <div className="display-flex  gap-10 w-100per jc-center">
+      <div className="operations-section">
         <input
           type="text"
           value={val1}
@@ -97,26 +116,14 @@ export default function LinkedListPlayground() {
         />
         <input
           type="text"
-          value={idxToAddAt}
-          onChange={(e) => setIdxToAddAt(e.target.value)}
-          placeholder="Node insertion index"
+          value={index}
+          onChange={(e) => setIndex(e.target.value)}
+          placeholder="Node index"
           className="custom-input"
         />
-
         <button onClick={insertNodeAtIdx} className="positive-op">
           Add
         </button>
-      </div>
-
-      <div className="display-flex  gap-10 w-100per jc-center">
-        <input
-          type="text"
-          value={idxToRemoveFrom}
-          onChange={(e) => setIdxToRemoveFrom(e.target.value)}
-          placeholder="Node deletion index"
-          className="custom-input"
-        />
-
         <button onClick={deleteNodeAtIdx} className="negative-op">
           Delete
         </button>

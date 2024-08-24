@@ -1,0 +1,60 @@
+@keyframes insertNode {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.8);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translateY(10px) scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes deleteNode {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translateY(-10px) scale(0.95);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.8);
+  }
+}
+
+.linked-list-outer-block {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  transition:
+    transform 2s ease-in-out,
+    opacity 2s ease-in-out;
+}
+
+.linked-list-block {
+  width: 5rem;
+  height: 3rem;
+  background-color: rgb(59, 89, 208);
+  border: 1px solid white;
+  font-weight: bold;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0.75rem;
+}
+
+.linked-list-outer-block.animate-insert {
+  animation: insertNode 2s ease-in-out forwards;
+}
+
+.linked-list-outer-block.animate-delete {
+  animation: deleteNode 2s ease-in-out forwards;
+}
