@@ -1,54 +1,122 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./css/playground.css";
 import "./css/block.css";
+import "./css/ll.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 
+const timings = {
+  create: 4000,
+  insert: 2000,
+  delete: 1000,
+};
+
 export default function LinkedListPlayground() {
   const [linkedList, setLinkedList] = useState([1, 2]);
-  const [value, setValue] = useState("");
-  const [idx, setIdx] = useState("");
+  const [val1, setVal1] = useState("");
+  const [index, setIndex] = useState("");
+  const [operation, setOperation] = useState(null); // Track the operation and index
   const [error, setError] = useState("");
 
-  const numValue = (value) => {
-    const sanitizedValue = value.replace(/[^\d]/g, "");
-    const parsedValue = parseInt(sanitizedValue, 10);
-    return isNaN(parsedValue) ? "" : parsedValue;
+  const numValue = (val) => {
+    const sanitizedValue = val.replace(/[^\d]/g, "");
+    return isNaN(parseInt(sanitizedValue, 10))
+      ? ""
+      : parseInt(sanitizedValue, 10);
+  };
+
+  const validateInput = (val, idx) => {
+    if (val.trim() === "") return "Please enter value";
+    if (idx.trim() === "") return "Please enter index";
+    const value = numValue(val);
+    const index = numValue(idx);
+    if (value === "") return "Value is NAN";
+    if (index === "") return "Index is NAN";
+    if (index > linkedList.length)
+      return `Cannot insert at invalid index (${index})`;
+    return "";
   };
 
   const insertNodeAtIdx = () => {
-    const val = numValue(value);
-    const index = numValue(idx);
+    const validationError = validateInput(val1, index);
+    if (validationError) return setError(validationError);
 
-    if (val === "") {
-      setError("Value is NAN");
-    } else if (index === "") {
-      setError("Index is NAN");
-    } else if (index > linkedList.length) {
-      setError(
-        `Cannot insert at invalid index (${index}) is greater than number of elements (${linkedList.length})`
-      );
-    } else {
+    const idx = numValue(index);
+    // first show create node animation
+    setOperation({ type: "create" });
+
+    // after create animation delay, show insert node animation
+    setTimeout(() => {
+      setOperation({ type: "insert", index: idx });
+      setLinkedList((prevList) => {
+        const ll = [...prevList];
+        ll.splice(idx, 0, numValue(val1));
+        return ll;
+      });
+      setVal1("");
+      setIndex("");
       setError("");
-      linkedList.splice(index, 0, val);
-      /**
-       * splice(start, deleteCount, item1, item2, ...):
-start: The index at which to start changing the array. 
-deleteCount: An integer indicating the number of elements to remove. (Here, 0, so no elements are removed.)
-item1, item2, ...: The elements to add to the array, starting at the start index.
-its inplace
-       */
-    }
+    }, timings.create); // Delay the insertion to match the create animation duration
   };
+
+  const deleteNodeAtIdx = () => {
+    if (index.trim() === "") return setError("Please enter index");
+
+    const idx = numValue(index);
+    if (idx === "") return setError("Index is NAN");
+    if (idx > linkedList.length - 1)
+      return setError(`Cannot delete from invalid index (${idx})`);
+
+    setOperation({ type: "delete", index: idx });
+    setError("");
+
+    // Delay the actual deletion to allow the animation to play
+    setTimeout(() => {
+      setLinkedList((prevList) => {
+        const ll = [...prevList];
+        ll.splice(idx, 1);
+        return ll;
+      });
+      setOperation(null); // Reset operation state after deletion
+      setVal1("");
+      setIndex("");
+    }, deleteAnimationDuration); // Match the duration of the delete animation
+  };
+
+  // Use useEffect to handle operation timing
+  useEffect(() => {
+    if (operation) {
+      const duration = timings[operation.type];
+      console.log("duration ", duration);
+      const timer = setTimeout(() => setOperation(null), duration);
+      return () => clearTimeout(timer);
+    }
+  }, [operation]);
 
   return (
     <div>
       <h1>Linked List Playground</h1>
 
+      {operation?.type === "create" && (
+        <div className="linked-list-outer-block animate-create">
+          <div className="linked-list-block">{val1}</div>
+          <FontAwesomeIcon className="linked-list-arrow" icon={faArrowRight} />
+        </div>
+      )}
+
       {linkedList.length > 0 && (
         <div className="linked-list-visual">
-          {linkedList.map((e, index) => (
-            <div key={index} className="linked-list-outer-block">
+          {linkedList.map((e, idx) => (
+            <div
+              key={idx}
+              className={`linked-list-outer-block ${
+                operation?.type === "insert" && operation.index === idx
+                  ? "animate-insert"
+                  : operation?.type === "delete" && operation.index === idx
+                    ? "animate-delete"
+                    : ""
+              }`}
+            >
               <div className="linked-list-block">{e}</div>
               <FontAwesomeIcon icon={faArrowRight} />
             </div>
@@ -59,24 +127,26 @@ its inplace
 
       {error && <div>{error}</div>}
 
-      <div className="display-flex  gap-10 w-100per jc-center">
+      <div className="operations-section">
         <input
           type="text"
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
+          value={val1}
+          onChange={(e) => setVal1(e.target.value)}
           placeholder="Value"
           className="custom-input"
         />
         <input
           type="text"
-          value={idx}
-          onChange={(e) => setIdx(e.target.value)}
-          placeholder="Node insertion index"
+          value={index}
+          onChange={(e) => setIndex(e.target.value)}
+          placeholder="Node index"
           className="custom-input"
         />
-
         <button onClick={insertNodeAtIdx} className="positive-op">
           Add
+        </button>
+        <button onClick={deleteNodeAtIdx} className="negative-op">
+          Delete
         </button>
       </div>
     </div>
