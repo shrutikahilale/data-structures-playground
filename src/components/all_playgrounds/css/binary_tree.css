@@ -1,0 +1,70 @@
+.subtree-container {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  /* margin-top: 2rem; Space between levels */
+  width: auto;
+}
+
+.node-with-arrows {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.subtree-node {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0.5rem 1rem;
+  font-weight: bold;
+}
+.non-null-node {
+  background-color: #0091ff;
+  cursor: pointer;
+}
+
+.null-node {
+  background-color: #76767681;
+}
+
+.binary-tree-arrows {
+  display: flex;
+  gap: 2rem;
+}
+
+.binary-tree-arrows-section {
+  font-size: 1.75rem;
+}
+
+.right-arrow {
+  transform: rotate(45deg);
+}
+
+.left-arrow {
+  transform: rotate(135deg);
+}
+
+.subtree-children {
+  display: flex;
+  justify-content: space-around; /* Distribute children evenly */
+  width: 100%;
+}
+
+.subtree-child {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* hover effects */
+.non-null-node:hover {
+  background-color: #414eff;
+}
+
+/* animations */
