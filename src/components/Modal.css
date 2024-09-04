@@ -1,0 +1,99 @@
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent; /* Changed to transparent to allow positioning */
+  display: block; /* Ensure backdrop covers the entire screen */
+  pointer-events: none; /* Allow clicks to pass through unless modal is visible */
+}
+
+.modal-content {
+  position: absolute;
+  background: rgba(
+    90,
+    90,
+    90,
+    0.9
+  ); /* Increased opacity for better visibility */
+  padding: 20px;
+  border-radius: 8px;
+  min-width: 300px;
+  animation: slideIn 0.3s;
+  pointer-events: auto; /* Enable interaction */
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 2px;
+  right: 10px;
+  /* background: none; */
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.hover-element {
+  display: inline-block;
+  padding: 10px;
+  background: rgb(165, 95, 250);
+  border: 1px solid #ddd;
+  cursor: pointer;
+}
+
+.operation-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.operation-list li {
+  padding: 10px;
+  background: #000000;
+  color: #fff;
+  margin: 5px 0;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.3s;
+}
+
+.operation-list li:hover {
+  background: #444;
+}
+
+.alert-modal {
+  background-color: rgba(255, 19, 137, 0.828);
+  border-radius: 20px;
+  padding: 10px;
+  animation: fadeInOut 3s;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-10px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}

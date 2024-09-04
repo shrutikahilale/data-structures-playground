@@ -2,6 +2,8 @@ import "./css/binary_tree.css";
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import Modal from "../modal_.jsx";
+import "../Modal.css";
 
 const SubTree = ({
   node,
@@ -9,6 +11,7 @@ const SubTree = ({
   level = 0,
   isLeftChild = false,
   onNodeClick,
+  onNodeHover,
 }) => {
   // Define styles dynamically based on the level
   const containerStyle =
@@ -28,6 +31,7 @@ const SubTree = ({
         <div
           className="subtree-node non-null-node"
           onClick={() => onNodeClick(node, parent, isLeftChild)}
+          onMouseEnter={() => onNodeHover(node, parent, isLeftChild)}
         >
           {node.value}
         </div>
@@ -50,6 +54,7 @@ const SubTree = ({
             level={level + 1}
             isLeftChild={true}
             onNodeClick={onNodeClick}
+            onNodeHover={onNodeHover}
           />
         </div>
         <div className="subtree-child">
@@ -59,6 +64,7 @@ const SubTree = ({
             level={level + 1}
             isLeftChild={false}
             onNodeClick={onNodeClick}
+            onNodeHover={onNodeHover}
           />
         </div>
       </div>
@@ -66,10 +72,14 @@ const SubTree = ({
   );
 };
 
-const BinaryTreeVisualizer = ({ root, onNodeClick }) => {
+const BinaryTreeVisualizer = ({ root, onNodeClick, onNodeHover }) => {
   return (
     <div className="binary-tree-container">
-      <SubTree node={root} onNodeClick={onNodeClick} />
+      <SubTree
+        node={root}
+        onNodeClick={onNodeClick}
+        onNodeHover={onNodeHover}
+      />
     </div>
   );
 };
@@ -95,7 +105,14 @@ const BinaryTreePlayground = () => {
   });
 
   // error
-  const [error, setError] = useState("");
+  const [alertMessage, setAlertMessage] = useState("");
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [inputModalVisible, setInputModalVisible] = useState(false);
+  const [operation, setOperation] = useState("");
+  const [inputValue, setInputValue] = useState("");
+  const [nodeData, setNodeData] = useState(null);
+  const [alertVisible, setAlertVisible] = useState(false);
 
   // valid position
   const getValidPosition = (node, newValue) => {
@@ -125,6 +142,9 @@ const BinaryTreePlayground = () => {
   };
 
   const findValidPosition = (node, newValue, isAddLeftNode) => {
+    setAlertVisible(false);
+    setAlertMessage("");
+
     const validPosition = getValidPosition(root, newValue);
 
     console.log(
@@ -147,7 +167,11 @@ const BinaryTreePlayground = () => {
             console.log("valid case 2");
           } else {
             console.log("invalid case");
-            setError("Invalid insertion position.");
+            setAlertMessage("Invalid insertion position.");
+            setAlertVisible(true);
+            setTimeout(() => {
+              setAlertVisible(false);
+            }, 3000);
             return;
           }
         };
@@ -157,13 +181,19 @@ const BinaryTreePlayground = () => {
           insertNode(validPosition, newValue);
           return { ...prevRoot }; // Update the state
         });
-
-        setError(""); // Clear any previous errors
       } else {
-        setError("Invalid insertion position.");
+        setAlertMessage("Invalid insertion position.");
+        setAlertVisible(true);
+        setTimeout(() => {
+          setAlertVisible(false);
+        }, 3000);
       }
     } else {
-      setError("No valid position found for the new node.");
+      setAlertMessage("No valid position found for the new node.");
+      setAlertVisible(true);
+      setTimeout(() => {
+        setAlertVisible(false);
+      }, 3000);
     }
   };
 
@@ -262,7 +292,7 @@ const BinaryTreePlayground = () => {
   };
 
   const updateNodeValue = (node, parent, newValue) => {
-    setError(""); // reset error
+    setAlertMessage(""); // reset error
 
     // Create a copy of the current tree structure without the current node
     const treeWithoutCurrentNode = JSON.parse(JSON.stringify(root)); // Copy the tree
@@ -286,8 +316,8 @@ const BinaryTreePlayground = () => {
     // Remove the current node from the copied tree
     const updatedTree = deleteNodeFromTree(treeWithoutCurrentNode, node.value);
 
-    console.log("tree : \n", updatedTree);
-    console.log("og tree : \n", root);
+    // console.log("tree : \n", updatedTree);
+    // console.log("og tree : \n", root);
 
     // Now, try to insert the new value into the copied tree
     const isValidBSTInsertion = getValidPosition(updatedTree, newValue);
@@ -304,11 +334,12 @@ const BinaryTreePlayground = () => {
       ) {
         if (node.left && node.left < newValue) {
           if (node.right && node.right > newValue) {
-            console.log("abhi correct position milaa");
+            // console.log("abhi correct position milaa");
             // If the new value maintains the BST properties, update the original node
             node.value = newValue;
             setRoot({ ...root }); // Update the state
-            setError(""); // Clear any previous errors
+            setAlertVisible(false);
+            setAlertMessage(""); // Clear any previous errors
             return;
           }
         }
@@ -321,29 +352,169 @@ const BinaryTreePlayground = () => {
       ) {
         if (node.left && node.left < newValue) {
           if (node.right && node.right > newValue) {
-            console.log("abhi correct position milaa");
+            // console.log("abhi correct position milaa");
             // If the new value maintains the BST properties, update the original node
             node.value = newValue;
             setRoot({ ...root }); // Update the state
-            setError(""); // Clear any previous errors
+            setAlertVisible(false);
+            setAlertMessage(""); // Clear any previous errors
             return;
           }
         }
       }
     }
 
-    console.log("abeyyy kaha ghusa raha hai node ko??");
-    setError(
+    // console.log("abeyyy kaha ghusa raha hai node ko??");
+    setAlertMessage(
       "Invalid value for updating the node. It violates the BST property."
     );
+    setAlertVisible(true);
+    setTimeout(() => {
+      setAlertVisible(false);
+    }, 3000);
+
     return;
+  };
+
+  const handleNodeHover = (node, parent, isLeftChild) => {
+    setModalVisible(true);
+    setNodeData({ node: node, parent: parent, isLeftChild: isLeftChild });
+
+    if (operation == 4) {
+      performOperation();
+    }
+  };
+
+  const performOperation = () => {
+    if (isNaN(inputValue)) {
+      setAlertMessage("Please enter valid input");
+      setAlertVisible(true);
+
+      setTimeout(() => {
+        setAlertVisible(false);
+      }, 3000);
+    } else {
+      console.log(`Operation selected: ${operation}`);
+
+      switch (operation) {
+        case 1:
+          // Add left node logic
+          findValidPosition(nodeData["node"], inputValue, true);
+          break;
+
+        case 2:
+          // Add right node logic
+          findValidPosition(nodeData["node"], inputValue, false);
+          break;
+
+        case 3:
+          // Update node value logic
+          updateNodeValue(nodeData["node"], nodeData["parent"], inputValue);
+          break;
+
+        case 4:
+          if (nodeData["parent"]) {
+            if (nodeData["isLeftChild"]) {
+              nodeData["parent"].left = null;
+            } else {
+              nodeData["parent"].right = null;
+            }
+          } else {
+            setRoot(null); // If it's the root node being deleted
+          }
+          setRoot({ ...root }); // Trigger re-render
+          break;
+        default:
+          break;
+      }
+    }
+
+    // reset
+    setInputValue("");
+    setOperation("");
+    setAlertMessage("");
+    setAlertVisible(false);
+    setModalVisible(false);
+    setInputModalVisible(false);
+  };
+
+  const handleInputChange = (e) => {
+    setInputValue(e.target.value);
   };
 
   return (
     <div>
       <h1>Binary Tree Playground</h1>
-      <BinaryTreeVisualizer root={root} onNodeClick={handleNodeClick} />
-      {error}
+      <BinaryTreeVisualizer
+        root={root}
+        onNodeClick={() => {}}
+        onNodeHover={handleNodeHover}
+      />
+      <Modal
+        isVisible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        // position={modalPosition}
+      >
+        {nodeData && <div>Node selected {nodeData["node"].value}</div>}
+        <ul className="operation-list">
+          <li
+            onClick={() => {
+              setOperation(1);
+              setInputModalVisible(true);
+              setModalVisible(false);
+            }}
+          >
+            Add left node
+          </li>
+          <li
+            onClick={() => {
+              setOperation(2);
+              setInputModalVisible(true);
+              setModalVisible(false);
+            }}
+          >
+            Add right node
+          </li>
+          <li
+            onClick={() => {
+              setOperation(3);
+              setInputModalVisible(true);
+              setModalVisible(false);
+            }}
+          >
+            Update node value
+          </li>
+          <li
+            onClick={() => {
+              setOperation(4);
+              setInputModalVisible(true);
+              setModalVisible(false);
+            }}
+          >
+            Delete node
+          </li>
+        </ul>
+      </Modal>
+      <Modal
+        isVisible={inputModalVisible && !alertVisible && operation != 4}
+        onClose={() => setInputModalVisible(false)}
+        position={{
+          top: window.innerHeight / 2 - 100, // Center vertically
+          left: window.innerWidth / 2 - 150, // Center horizontally
+        }}
+      >
+        <h3>{operation}</h3>
+        <input
+          type="text"
+          value={inputValue}
+          onChange={handleInputChange}
+          placeholder={`Enter value for ${operation}`}
+          className="custom-input"
+        />
+        <button onClick={() => performOperation()}>Submit</button>
+      </Modal>
+
+      {alertMessage && <div className="alert-modal"> {alertMessage}</div>}
     </div>
   );
 };
