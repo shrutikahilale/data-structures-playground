@@ -113,6 +113,7 @@ const BinaryTreePlayground = () => {
   const [inputValue, setInputValue] = useState("");
   const [nodeData, setNodeData] = useState(null);
   const [alertVisible, setAlertVisible] = useState(false);
+  const [operationString, setOperationString] = useState("Add left node");
 
   // valid position
   const getValidPosition = (node, newValue) => {
@@ -432,6 +433,7 @@ const BinaryTreePlayground = () => {
     // reset
     setInputValue("");
     setOperation("");
+    setOperationString("");
     setAlertMessage("");
     setAlertVisible(false);
     setModalVisible(false);
@@ -440,6 +442,19 @@ const BinaryTreePlayground = () => {
 
   const handleInputChange = (e) => {
     setInputValue(e.target.value);
+  };
+
+  const getOperation = (operation) => {
+    switch (operation) {
+      case "1":
+        return "Add node";
+      case "2":
+        return "Add right node";
+      case "3":
+        return "Update node";
+      case "4":
+        return "Delete node";
+    }
   };
 
   return (
@@ -460,6 +475,7 @@ const BinaryTreePlayground = () => {
           <li
             onClick={() => {
               setOperation(1);
+              setOperationString("Add left node");
               setInputModalVisible(true);
               setModalVisible(false);
             }}
@@ -469,6 +485,7 @@ const BinaryTreePlayground = () => {
           <li
             onClick={() => {
               setOperation(2);
+              setOperationString("Add right node");
               setInputModalVisible(true);
               setModalVisible(false);
             }}
@@ -478,6 +495,7 @@ const BinaryTreePlayground = () => {
           <li
             onClick={() => {
               setOperation(3);
+              setOperationString("Update node value");
               setInputModalVisible(true);
               setModalVisible(false);
             }}
@@ -487,6 +505,7 @@ const BinaryTreePlayground = () => {
           <li
             onClick={() => {
               setOperation(4);
+              setOperationString("Delete node");
               setInputModalVisible(true);
               setModalVisible(false);
             }}
@@ -503,12 +522,12 @@ const BinaryTreePlayground = () => {
           left: window.innerWidth / 2 - 150, // Center horizontally
         }}
       >
-        <h3>{operation}</h3>
+        <h3>{operationString}</h3>
         <input
           type="text"
           value={inputValue}
           onChange={handleInputChange}
-          placeholder={`Enter value for ${operation}`}
+          placeholder={`Enter value`}
           className="custom-input"
         />
         <button onClick={() => performOperation()}>Submit</button>
