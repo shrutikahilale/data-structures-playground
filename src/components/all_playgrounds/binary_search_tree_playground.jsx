@@ -2,7 +2,6 @@ import "./css/binary_tree.css";
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
-import Modal from "../modal_.jsx";
 import "../Modal.css";
 
 const SubTree = ({
@@ -99,7 +98,6 @@ const BinaryTreePlayground = () => {
   // error
   const [nodeData, setNodeData] = useState(null);
   const [inputModalVisible, setInputModalVisible] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
   const [operation, setOperation] = useState("");
   const [operationString, setOperationString] = useState("Add left node");
   const [inputValue, setInputValue] = useState("");
@@ -456,62 +454,6 @@ const BinaryTreePlayground = () => {
           </button>
         </div>
       )}
-
-      {/* <Modal
-        isVisible={modalVisible}
-        onClose={() => {
-          console.log("clicked");
-          setModalVisible(false);
-        }}
-      >
-        {nodeData && <div>Node selected {nodeData["node"].value}</div>}
-        <ul className="operation-list">
-          {nodeData && !nodeData["node"].left && (
-            <li
-              onClick={() => {
-                setOperation(1);
-                setOperationString("Add left node");
-                setInputModalVisible(true);
-                setModalVisible(false);
-              }}
-            >
-              Add left node
-            </li>
-          )}
-          {nodeData && !nodeData["node"].right && (
-            <li
-              onClick={() => {
-                setOperation(2);
-                setOperationString("Add right node");
-                setInputModalVisible(true);
-                setModalVisible(false);
-              }}
-            >
-              Add right node
-            </li>
-          )}
-          <li
-            onClick={() => {
-              setOperation(3);
-              setOperationString("Update node value");
-              setInputModalVisible(true);
-              setModalVisible(false);
-            }}
-          >
-            Update node value
-          </li>
-          <li
-            onClick={() => {
-              setOperation(4);
-              setOperationString("Delete node");
-              setInputModalVisible(true);
-              setModalVisible(false);
-            }}
-          >
-            Delete node
-          </li>
-        </ul>
-      </Modal> */}
     </div>
   );
 };
