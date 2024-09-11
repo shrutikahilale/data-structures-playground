@@ -1,7 +1,8 @@
 .modal-backdrop {
+  color: black;
   position: fixed;
-  top: 0;
-  left: 0;
+  /* top: 0;
+  left: 0; */
   width: 100%;
   height: 100%;
   background: transparent; /* Changed to transparent to allow positioning */
@@ -10,25 +11,23 @@
 }
 
 .modal-content {
-  position: absolute;
-  background: rgba(
-    90,
-    90,
-    90,
-    0.9
-  ); /* Increased opacity for better visibility */
+  position: fixed; /* Fix the position */
+  z-index: 1000; /* Make sure it's above other content */
+  top: 50%; /* Adjust top to your desired location */
+  left: 50%; /* Center horizontally */
+  transform: translateX(-50%); /* Correct centering */
   padding: 20px;
+  background: white;
+  border: 1px solid #ccc;
   border-radius: 8px;
-  min-width: 300px;
-  animation: slideIn 0.3s;
-  pointer-events: auto; /* Enable interaction */
 }
 
 .modal-close-btn {
   position: absolute;
   top: 2px;
   right: 10px;
-  /* background: none; */
+  background: none;
+  color: black;
   font-size: 18px;
   cursor: pointer;
 }
@@ -42,19 +41,24 @@
 }
 
 .operation-list {
+  display: flex;
+  justify-content: center;
   list-style: none;
+  gap: 1rem;
   padding: 0;
-  margin: 0;
+  margin: 1rem 0;
 }
 
 .operation-list li {
+  width: fit-content;
   padding: 10px;
-  background: #000000;
+  background: #333333;
   color: #fff;
   margin: 5px 0;
   cursor: pointer;
   border-radius: 4px;
   transition: background 0.3s;
+  font-size: 0.875rem;
 }
 
 .operation-list li:hover {
@@ -62,10 +66,16 @@
 }
 
 .alert-modal {
-  background-color: rgba(255, 19, 137, 0.828);
   border-radius: 20px;
   padding: 10px;
   animation: fadeInOut 3s;
+}
+
+.alert-modal.warning {
+  background-color: rgba(255, 19, 137, 0.828);
+}
+.alert-modal.success {
+  background-color: green;
 }
 
 @keyframes fadeIn {

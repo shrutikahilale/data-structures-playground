@@ -11,7 +11,6 @@ const SubTree = ({
   level = 0,
   isLeftChild = false,
   onNodeClick,
-  onNodeHover,
 }) => {
   // Define styles dynamically based on the level
   const containerStyle =
@@ -31,7 +30,6 @@ const SubTree = ({
         <div
           className="subtree-node non-null-node"
           onClick={() => onNodeClick(node, parent, isLeftChild)}
-          onMouseEnter={() => onNodeHover(node, parent, isLeftChild)}
         >
           {node.value}
         </div>
@@ -54,7 +52,6 @@ const SubTree = ({
             level={level + 1}
             isLeftChild={true}
             onNodeClick={onNodeClick}
-            onNodeHover={onNodeHover}
           />
         </div>
         <div className="subtree-child">
@@ -64,7 +61,6 @@ const SubTree = ({
             level={level + 1}
             isLeftChild={false}
             onNodeClick={onNodeClick}
-            onNodeHover={onNodeHover}
           />
         </div>
       </div>
@@ -72,14 +68,10 @@ const SubTree = ({
   );
 };
 
-const BinaryTreeVisualizer = ({ root, onNodeClick, onNodeHover }) => {
+const BinaryTreeVisualizer = ({ root, onNodeClick }) => {
   return (
     <div className="binary-tree-container">
-      <SubTree
-        node={root}
-        onNodeClick={onNodeClick}
-        onNodeHover={onNodeHover}
-      />
+      <SubTree node={root} onNodeClick={onNodeClick} />
     </div>
   );
 };
@@ -105,15 +97,17 @@ const BinaryTreePlayground = () => {
   });
 
   // error
-  const [alertMessage, setAlertMessage] = useState("");
-
-  const [modalVisible, setModalVisible] = useState(false);
-  const [inputModalVisible, setInputModalVisible] = useState(false);
-  const [operation, setOperation] = useState("");
-  const [inputValue, setInputValue] = useState("");
   const [nodeData, setNodeData] = useState(null);
-  const [alertVisible, setAlertVisible] = useState(false);
+  const [inputModalVisible, setInputModalVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [operation, setOperation] = useState("");
   const [operationString, setOperationString] = useState("Add left node");
+  const [inputValue, setInputValue] = useState("");
+  const [{ alertMessage, typeMessage }, setAlertMessage] = useState({
+    alertMessage: "",
+    typeMessage: "",
+  });
+  const [alertVisible, setAlertVisible] = useState(false);
 
   // valid position
   const getValidPosition = (node, newValue) => {
@@ -144,7 +138,7 @@ const BinaryTreePlayground = () => {
 
   const findValidPosition = (node, newValue, isAddLeftNode) => {
     setAlertVisible(false);
-    setAlertMessage("");
+    setAlertMessage({ alertMessage: "", typeMessage: "" });
 
     const validPosition = getValidPosition(root, newValue);
 
@@ -168,7 +162,7 @@ const BinaryTreePlayground = () => {
             console.log("valid case 2");
           } else {
             console.log("invalid case");
-            setAlertMessage("Invalid insertion position.");
+            setAlertMessage("Invalid insertion position", "warning");
             setAlertVisible(true);
             setTimeout(() => {
               setAlertVisible(false);
@@ -183,14 +177,14 @@ const BinaryTreePlayground = () => {
           return { ...prevRoot }; // Update the state
         });
       } else {
-        setAlertMessage("Invalid insertion position.");
+        setAlertMessage("Invalid insertion position", "warning");
         setAlertVisible(true);
         setTimeout(() => {
           setAlertVisible(false);
         }, 3000);
       }
     } else {
-      setAlertMessage("No valid position found for the new node.");
+      setAlertMessage("No valid position found for the new node", "warning");
       setAlertVisible(true);
       setTimeout(() => {
         setAlertVisible(false);
@@ -221,163 +215,74 @@ const BinaryTreePlayground = () => {
     return tree;
   };
 
-  const handleNodeClick = (node, parent, isLeftChild) => {
-    const operation = parseInt(
-      prompt(
-        "Enter operation: \n1. Add left node \n2. Add right node \n3. Update value of the node \n4. Delete the node"
-      )
-    );
+  const findNodeToBeUpdated = (rootNode, value) => {
+    if (rootNode == null) return null;
 
-    var inputVal;
-
-    console.log(`Operation selected: ${operation}`);
-
-    if (!isNaN(operation)) {
-      switch (operation) {
-        case 1:
-          // Add left node logic
-          inputVal = parseInt(prompt("Enter value for the left node: "), 10);
-          if (isNaN(inputVal)) {
-            alert("Please enter a valid number.");
-            return;
-          }
-          findValidPosition(node, inputVal, true);
-          break;
-
-        case 2:
-          // Add right node logic
-          inputVal = parseInt(prompt("Enter value for the right node: "), 10);
-          if (isNaN(inputVal)) {
-            alert("Please enter a valid number.");
-            return;
-          }
-          findValidPosition(node, inputVal, false);
-          break;
-
-        case 3:
-          // Update node value logic
-          inputVal = parseInt(prompt("Enter new value for the node: "), 10);
-          if (isNaN(inputVal)) {
-            alert("Please enter a valid number.");
-            return;
-          }
-          updateNodeValue(node, parent, inputVal);
-          break;
-
-        case 4:
-          // Delete node logic
-          const confirmation = window.confirm(
-            "Are you sure you want to delete this node?"
-          );
-          if (confirmation) {
-            if (parent) {
-              if (isLeftChild) {
-                parent.left = null;
-              } else {
-                parent.right = null;
-              }
-            } else {
-              setRoot(null); // If it's the root node being deleted
-            }
-            setRoot({ ...root }); // Trigger re-render
-          }
-          console.log("after deleting : " + root);
-          break;
-        default:
-          alert(`Invalid operation selected: ${operation}`);
-          return;
-      }
-    } else {
-      alert("Invalid operation selected");
+    if (rootNode.value === value) {
+      return rootNode;
     }
+
+    if (rootNode.value > value) {
+      return findNodeToBeUpdated(rootNode.left, value);
+    }
+    return findNodeToBeUpdated(rootNode.right, value);
   };
 
-  const updateNodeValue = (node, parent, newValue) => {
-    setAlertMessage(""); // reset error
+  const isValidBST = (node, min = null, max = null) => {
+    // An empty node is considered valid
+    if (node === null) {
+      return true;
+    }
 
-    // Create a copy of the current tree structure without the current node
-    const treeWithoutCurrentNode = JSON.parse(JSON.stringify(root)); // Copy the tree
-
-    const deleteNodeFromTree = (tree, targetValue) => {
-      // Function to delete the node and its subtree from the copied tree
-      if (!tree) return null;
-
-      if (targetValue < tree.value) {
-        tree.left = deleteNodeFromTree(tree.left, targetValue);
-      } else if (targetValue > tree.value) {
-        tree.right = deleteNodeFromTree(tree.right, targetValue);
-      } else {
-        // Node to be deleted found; set it to null, effectively deleting it with its subtree
-        return null;
-      }
-
-      return tree;
-    };
-
-    // Remove the current node from the copied tree
-    const updatedTree = deleteNodeFromTree(treeWithoutCurrentNode, node.value);
-
-    // console.log("tree : \n", updatedTree);
-    // console.log("og tree : \n", root);
-
-    // Now, try to insert the new value into the copied tree
-    const isValidBSTInsertion = getValidPosition(updatedTree, newValue);
-
-    console.log(isValidBSTInsertion);
+    // If the node's value violates the min/max constraint, it's not a valid BST
     if (
-      (isValidBSTInsertion && isValidBSTInsertion.value === parent.value) ||
-      (node.right && newValue < node.right)
+      (min !== null && node.value <= min) ||
+      (max !== null && node.value >= max)
     ) {
-      if (
-        parent.left &&
-        parent.left.value === node.value &&
-        newValue < parent.value
-      ) {
-        if (node.left && node.left < newValue) {
-          if (node.right && node.right > newValue) {
-            // console.log("abhi correct position milaa");
-            // If the new value maintains the BST properties, update the original node
-            node.value = newValue;
-            setRoot({ ...root }); // Update the state
-            setAlertVisible(false);
-            setAlertMessage(""); // Clear any previous errors
-            return;
-          }
-        }
-      }
-
-      if (
-        parent.right &&
-        parent.right.value === node.value &&
-        newValue > parent.value
-      ) {
-        if (node.left && node.left < newValue) {
-          if (node.right && node.right > newValue) {
-            // console.log("abhi correct position milaa");
-            // If the new value maintains the BST properties, update the original node
-            node.value = newValue;
-            setRoot({ ...root }); // Update the state
-            setAlertVisible(false);
-            setAlertMessage(""); // Clear any previous errors
-            return;
-          }
-        }
-      }
+      return false;
     }
 
-    // console.log("abeyyy kaha ghusa raha hai node ko??");
-    setAlertMessage(
-      "Invalid value for updating the node. It violates the BST property."
+    // Recursively check the left and right subtrees with updated constraints
+    return (
+      isValidBST(node.left, min, node.value) &&
+      isValidBST(node.right, node.value, max)
     );
-    setAlertVisible(true);
-    setTimeout(() => {
-      setAlertVisible(false);
-    }, 3000);
-
-    return;
   };
 
-  const handleNodeHover = (node, parent, isLeftChild) => {
+  const updateNodeValueV2 = (node, newValue) => {
+    // Reset errors
+    setAlertMessage({ alertMessage: "", typeMessage: "" });
+    setAlertVisible(false);
+
+    // Copy the tree
+    const copiedTree = JSON.parse(JSON.stringify(root));
+
+    // find the node to be updated and update the value in the copiedTree
+    var nodeToBeUpdated = findNodeToBeUpdated(copiedTree, node.value); // console.log("nodeToBeUpdated ", nodeToBeUpdated.value);
+    nodeToBeUpdated.value = newValue; // console.log("nodeToBeUpdated ", nodeToBeUpdated.value);
+
+    // check if the copiedTree is valid BST
+    const res = isValidBST(copiedTree);
+
+    if (res) {
+      // if yes then update the original tree
+      node.value = newValue;
+      setRoot({ ...root });
+      console.log("valid BST");
+      setAlertMessage({ alertMessage: "Node Updated", typeMessage: "success" });
+      setAlertVisible(true);
+    } else {
+      // else show error
+      console.log("invalid BST");
+      setAlertMessage({
+        alertMessage: "Invalid updation",
+        typeMessage: "warning",
+      });
+      setAlertVisible(true);
+    }
+  };
+
+  const handleNodeClick = (node, parent, isLeftChild) => {
     setModalVisible(true);
     setNodeData({ node: node, parent: parent, isLeftChild: isLeftChild });
 
@@ -387,16 +292,18 @@ const BinaryTreePlayground = () => {
   };
 
   const performOperation = () => {
-    if (isNaN(inputValue)) {
-      setAlertMessage("Please enter valid input");
+    if (operation != "" && isNaN(inputValue)) {
+      setAlertMessage({
+        alertMessage: "Please enter valid input",
+        typeMessage: "warning",
+      });
+
       setAlertVisible(true);
 
       setTimeout(() => {
         setAlertVisible(false);
       }, 3000);
     } else {
-      console.log(`Operation selected: ${operation}`);
-
       switch (operation) {
         case 1:
           // Add left node logic
@@ -410,10 +317,11 @@ const BinaryTreePlayground = () => {
 
         case 3:
           // Update node value logic
-          updateNodeValue(nodeData["node"], nodeData["parent"], inputValue);
+          updateNodeValueV2(nodeData["node"], inputValue);
           break;
 
-        case 4:
+        default:
+          // delete node
           if (nodeData["parent"]) {
             if (nodeData["isLeftChild"]) {
               nodeData["parent"].left = null;
@@ -423,9 +331,13 @@ const BinaryTreePlayground = () => {
           } else {
             setRoot(null); // If it's the root node being deleted
           }
+          // display alert
+          setAlertMessage({
+            alertMessage: "Node deleted successfully",
+            typeMessage: "success",
+          });
+          setAlertVisible(true);
           setRoot({ ...root }); // Trigger re-render
-          break;
-        default:
           break;
       }
     }
@@ -434,64 +346,150 @@ const BinaryTreePlayground = () => {
     setInputValue("");
     setOperation("");
     setOperationString("");
-    setAlertMessage("");
-    setAlertVisible(false);
     setModalVisible(false);
     setInputModalVisible(false);
+    setNodeData("");
+    // reset after animation fades out
+    setTimeout(() => {
+      setAlertMessage({ alertMessage: "", typeMessage: "" });
+      setAlertVisible(false);
+    }, 3000);
   };
 
   const handleInputChange = (e) => {
     setInputValue(e.target.value);
   };
 
-  const getOperation = (operation) => {
-    switch (operation) {
-      case "1":
-        return "Add node";
-      case "2":
-        return "Add right node";
-      case "3":
-        return "Update node";
-      case "4":
-        return "Delete node";
+  const onAddRootNode = () => {
+    const newRootValue = prompt("Enter root node value:");
+    if (!isNaN(newRootValue)) {
+      setRoot({
+        value: parseInt(newRootValue),
+        left: null,
+        right: null,
+      });
+    } else {
+      alert("Please enter a valid number.");
     }
   };
 
   return (
-    <div>
+    <div id="section-BT">
       <h1>Binary Tree Playground</h1>
-      <BinaryTreeVisualizer
-        root={root}
-        onNodeClick={() => {}}
-        onNodeHover={handleNodeHover}
-      />
-      <Modal
+
+      {alertMessage && (
+        <div className={`alert-modal ${typeMessage}`}> {alertMessage}</div>
+      )}
+
+      {nodeData && (
+        <div>
+          <div className="block-node-selected">
+            Node selected = {nodeData["node"].value}
+          </div>
+          <div>Select the operation you would like to perform</div>
+          <ul className="operation-list">
+            {nodeData && !nodeData["node"].left && (
+              <li
+                onClick={() => {
+                  setOperation(1);
+                  setOperationString("Add left node");
+                  setInputModalVisible(true);
+                }}
+              >
+                Add left node
+              </li>
+            )}
+            {nodeData && !nodeData["node"].right && (
+              <li
+                onClick={() => {
+                  setOperation(2);
+                  setOperationString("Add right node");
+                  setInputModalVisible(true);
+                }}
+              >
+                Add right node
+              </li>
+            )}
+            <li
+              onClick={() => {
+                setOperation(3);
+                setOperationString("Update node value");
+                setInputModalVisible(true);
+                setModalVisible(false);
+              }}
+            >
+              Update node value
+            </li>
+            <li
+              onClick={() => {
+                performOperation();
+              }}
+            >
+              Delete node
+            </li>
+          </ul>
+
+          {inputModalVisible && !alertVisible && operation != 4 && (
+            <div>
+              <div onClick={() => setInputModalVisible(false)}>✖</div>
+              <h3>{operationString}</h3>
+              <input
+                type="text"
+                value={inputValue}
+                onChange={handleInputChange}
+                placeholder={`Enter value`}
+                className="custom-input"
+              />
+              <button onClick={() => performOperation()}>Submit</button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {root ? (
+        <BinaryTreeVisualizer root={root} onNodeClick={handleNodeClick} />
+      ) : (
+        <div className="binary-tree-empty">
+          <p>Tree is empty. Please add a new root node.</p>
+          <button onClick={onAddRootNode} className="add-root-button">
+            Add Root Node
+          </button>
+        </div>
+      )}
+
+      {/* <Modal
         isVisible={modalVisible}
-        onClose={() => setModalVisible(false)}
-        // position={modalPosition}
+        onClose={() => {
+          console.log("clicked");
+          setModalVisible(false);
+        }}
       >
         {nodeData && <div>Node selected {nodeData["node"].value}</div>}
         <ul className="operation-list">
-          <li
-            onClick={() => {
-              setOperation(1);
-              setOperationString("Add left node");
-              setInputModalVisible(true);
-              setModalVisible(false);
-            }}
-          >
-            Add left node
-          </li>
-          <li
-            onClick={() => {
-              setOperation(2);
-              setOperationString("Add right node");
-              setInputModalVisible(true);
-              setModalVisible(false);
-            }}
-          >
-            Add right node
-          </li>
+          {nodeData && !nodeData["node"].left && (
+            <li
+              onClick={() => {
+                setOperation(1);
+                setOperationString("Add left node");
+                setInputModalVisible(true);
+                setModalVisible(false);
+              }}
+            >
+              Add left node
+            </li>
+          )}
+          {nodeData && !nodeData["node"].right && (
+            <li
+              onClick={() => {
+                setOperation(2);
+                setOperationString("Add right node");
+                setInputModalVisible(true);
+                setModalVisible(false);
+              }}
+            >
+              Add right node
+            </li>
+          )}
           <li
             onClick={() => {
               setOperation(3);
@@ -513,27 +511,7 @@ const BinaryTreePlayground = () => {
             Delete node
           </li>
         </ul>
-      </Modal>
-      <Modal
-        isVisible={inputModalVisible && !alertVisible && operation != 4}
-        onClose={() => setInputModalVisible(false)}
-        position={{
-          top: window.innerHeight / 2 - 100, // Center vertically
-          left: window.innerWidth / 2 - 150, // Center horizontally
-        }}
-      >
-        <h3>{operationString}</h3>
-        <input
-          type="text"
-          value={inputValue}
-          onChange={handleInputChange}
-          placeholder={`Enter value`}
-          className="custom-input"
-        />
-        <button onClick={() => performOperation()}>Submit</button>
-      </Modal>
-
-      {alertMessage && <div className="alert-modal"> {alertMessage}</div>}
+      </Modal> */}
     </div>
   );
 };
